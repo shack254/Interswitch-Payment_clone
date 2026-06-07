@@ -1,0 +1,119 @@
+
+<style>
+  .prd-root { font-family: var(--font-sans); padding: 1.5rem 0; max-width: 680px; }
+  .prd-header { margin-bottom: 2rem; }
+  .prd-header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 6px; }
+  .prd-header p { font-size: 14px; color: var(--color-text-secondary); margin: 0; }
+  .badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; margin-right: 6px; }
+  .badge-purple { background: #EEEDFE; color: #3C3489; }
+  .badge-teal { background: #E1F5EE; color: #085041; }
+  .badge-amber { background: #FAEEDA; color: #633806; }
+  .badge-coral { background: #FAECE7; color: #712B13; }
+  .badge-gray { background: #F1EFE8; color: #444441; }
+  .section { margin-bottom: 2rem; }
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 10px; }
+  .card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+  .card-title i { font-size: 16px; }
+  .card-body { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin: 0; }
+  .req-list { list-style: none; padding: 0; margin: 0; }
+  .req-list li { font-size: 13px; color: var(--color-text-secondary); padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; }
+  .req-list li:last-child { border-bottom: none; }
+  .req-id { font-size: 11px; font-weight: 500; background: var(--color-background-secondary); color: var(--color-text-secondary); border-radius: 4px; padding: 2px 6px; min-width: 48px; text-align: center; margin-top: 1px; flex-shrink: 0; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .metric-label { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 4px; }
+  .metric-value { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .stack-tag { display: inline-block; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 6px; font-size: 12px; padding: 4px 10px; margin: 3px 3px 3px 0; color: var(--color-text-primary); font-family: var(--font-mono); }
+  .out-of-scope { font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; padding: 12px 14px; background: var(--color-background-secondary); border-left: 3px solid #F0997B; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+</style>
+
+<div class="prd-root">
+  <h2 class="sr-only">Product Requirements Document: Simplified Interbank Switch (PesaLink-style)</h2>
+
+  <div class="prd-header">
+    <h1>Simplified interbank switch — learning project PRD</h1>
+    <p>
+      <span class="badge badge-purple">Learning project</span>
+      <span class="badge badge-teal">Python / REST JSON</span>
+      <span class="badge badge-gray">v1.0 scope</span>
+    </p>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Project scope</p>
+    <div class="card">
+      <p class="card-title"><i class="ti ti-target" aria-hidden="true"></i> What we're building</p>
+      <p class="card-body">A Python-based simulation of an interbank payment switch (inspired by PesaLink) that routes fund transfer requests between dummy bank instances via JSON REST APIs. Includes a reusable dummy bank model with customer records, balance management, and transaction history. The goal is to understand payment switch architecture through code — not to build production infrastructure.</p>
+    </div>
+    <div class="out-of-scope">
+      <strong style="color: var(--color-text-primary);">Out of scope (v1):</strong> real banking integrations, cryptographic message signing, regulatory compliance (CBK, PCI-DSS), mobile/USSD interfaces, fraud detection engines, foreign currency handling, loan or credit products.
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Functional requirements — switch core</p>
+    <ul class="req-list">
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-01</span> Accept an inbound transfer request via <code style="font-size:12px;">POST /transfer</code> with JSON payload: sender account, receiver account, amount, currency, and transaction reference.</li>
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-02</span> Route the request to the correct destination bank based on the receiver's bank code (parsed from account number or a routing table).</li>
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-03</span> Validate the sender: confirm account exists, is active, and has sufficient balance before debiting.</li>
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-04</span> Debit the sender's account at the source bank and credit the receiver's account at the destination bank atomically (simulate a two-phase approach).</li>
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-05</span> Return a structured JSON response with a status code (<code style="font-size:12px;">SUCCESS</code>, <code style="font-size:12px;">FAILED</code>, <code style="font-size:12px;">PENDING</code>), transaction ID, and timestamp.</li>
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-06</span> Expose a <code style="font-size:12px;">GET /transaction/{ref}</code> endpoint to query transaction status by reference.</li>
+      <li><span class="req-id badge-purple" style="background:#EEEDFE;color:#3C3489;">FR-07</span> Handle and return meaningful error codes for: insufficient funds, account not found, invalid amount, duplicate transaction reference.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Functional requirements — dummy bank model</p>
+    <ul class="req-list">
+      <li><span class="req-id badge-teal" style="background:#E1F5EE;color:#085041;">FR-08</span> Each dummy bank instance exposes its own REST API with endpoints for account lookup, balance check, debit, and credit operations.</li>
+      <li><span class="req-id badge-teal" style="background:#E1F5EE;color:#085041;">FR-09</span> Customer records must include: account number, full name, national ID, phone number, account status (active/frozen/closed), and current balance.</li>
+      <li><span class="req-id badge-teal" style="background:#E1F5EE;color:#085041;">FR-10</span> Seed data must include at least 10 dummy customers across two bank instances to enable realistic test scenarios.</li>
+      <li><span class="req-id badge-teal" style="background:#E1F5EE;color:#085041;">FR-11</span> Balance deduction must reject if the resulting balance would go below zero (no overdraft in v1).</li>
+      <li><span class="req-id badge-teal" style="background:#E1F5EE;color:#085041;">FR-12</span> Each bank must maintain a simple transaction log (in-memory or SQLite) recording debit/credit events with timestamps.</li>
+      <li><span class="req-id badge-teal" style="background:#E1F5EE;color:#085041;">FR-13</span> Expose a <code style="font-size:12px;">GET /account/{account_no}/balance</code> endpoint for balance enquiry.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Non-functional requirements</p>
+    <ul class="req-list">
+      <li><span class="req-id badge-amber" style="background:#FAEEDA;color:#633806;">NFR-01</span><span><strong style="color:var(--color-text-primary);font-weight:500;">Testability:</strong> All switch logic and bank model logic must have pytest unit tests. Target ≥80% coverage on business logic functions (validation, routing, balance checks).</span></li>
+      <li><span class="req-id badge-amber" style="background:#FAEEDA;color:#633806;">NFR-02</span><span><strong style="color:var(--color-text-primary);font-weight:500;">Observability:</strong> All API requests and responses must be logged with method, endpoint, payload summary, status code, and latency. Use Python's built-in <code style="font-size:12px;">logging</code> module.</span></li>
+      <li><span class="req-id badge-amber" style="background:#FAEEDA;color:#633806;">NFR-03</span><span><strong style="color:var(--color-text-primary);font-weight:500;">Error handling:</strong> No unhandled exceptions should return a 500 to the client. All error paths must return a structured JSON error body with a code and message.</span></li>
+      <li><span class="req-id badge-amber" style="background:#FAEEDA;color:#633806;">NFR-04</span><span><strong style="color:var(--color-text-primary);font-weight:500;">Portability:</strong> Must run locally with a single <code style="font-size:12px;">python main.py</code> or <code style="font-size:12px;">uvicorn</code> command. No external services required (no real DB, no message queue).</span></li>
+      <li><span class="req-id badge-amber" style="background:#FAEEDA;color:#633806;">NFR-05</span><span><strong style="color:var(--color-text-primary);font-weight:500;">Documentation:</strong> README must explain the system architecture, how to run the project, and include at least 3 example curl/requests calls with expected responses.</span></li>
+      <li><span class="req-id badge-amber" style="background:#FAEEDA;color:#633806;">NFR-06</span><span><strong style="color:var(--color-text-primary);font-weight:500;">Consistency:</strong> All API responses must follow a uniform JSON envelope: <code style="font-size:12px;">status</code>, <code style="font-size:12px;">data</code>, <code style="font-size:12px;">error</code>, <code style="font-size:12px;">timestamp</code>.</span></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Suggested tech stack</p>
+    <span class="stack-tag">FastAPI</span>
+    <span class="stack-tag">Pydantic</span>
+    <span class="stack-tag">pytest</span>
+    <span class="stack-tag">httpx (test client)</span>
+    <span class="stack-tag">SQLite / in-memory dict</span>
+    <span class="stack-tag">uvicorn</span>
+    <span class="stack-tag">python-dotenv</span>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Key learning outcomes</p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <div class="card" style="margin-bottom:0;">
+        <p class="card-title" style="font-size:13px;"><i class="ti ti-api" aria-hidden="true"></i> REST API design</p>
+        <p class="card-body" style="font-size:12px;">Endpoints, HTTP verbs, status codes, JSON contract design</p>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <p class="card-title" style="font-size:13px;"><i class="ti ti-test-pipe" aria-hidden="true"></i> API testing with pytest</p>
+        <p class="card-body" style="font-size:12px;">Fixtures, mocking, httpx test client, edge-case coverage</p>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <p class="card-title" style="font-size:13px;"><i class="ti ti-route" aria-hidden="true"></i> Switch routing logic</p>
+        <p class="card-body" style="font-size:12px;">Bank code resolution, two-phase debit/credit, idempotency keys</p>
+      </div>
+    </div>
+  </div>
+</div>
