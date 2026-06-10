@@ -1,7 +1,13 @@
-from fastapi import FastAPI
+#from fastapi import FastAPI
+#
+#app = FastAPI()
+#
+#@app.get("/")
+#def health_check():
+#    return {"status": "bank service running"}
 
-app = FastAPI()
+from store import  get_account_balance 
 
-@app.get("/")
-def health_check():
-    return {"status": "bank service running"}
+balance = get_account_balance("254700000001")
+print(balance)
+
