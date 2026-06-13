@@ -4,16 +4,6 @@ from sqlalchemy import create_engine, text
 import os
 
 
-#@pytest.fixture
-
-@pytest.fixture
-def account_bal_setup():
-    return get_account_details("254700000001")
-
-@pytest.fixture
-def restricted_accont_setup():
-    return get_account_details("254700000002")
-
 @pytest.fixture
 def debit_account_setup(account_bal_setup):
     amount = '1000'
