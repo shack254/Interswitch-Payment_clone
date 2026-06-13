@@ -14,12 +14,12 @@ CUST_HIGH_RANGE = 9E10
 connection_string = f"mysql+mysqldb://{DB_USER}:{DB_PASSWORD}@{DB_URL}:3306/corebank$01"
 engine = create_engine(connection_string, echo=False)
 
-def get_account_balance(account_number):
+def get_account_details(account_number):
     with engine.connect() as connection: 
-        query = text("select balance from account where id = :id")
+        query = text("select * from account where id = :id")
         result = connection.execute(query, {"id": f"{account_number}"})
         account = result.mappings().first()
-        return account["balance"]
+        return account
 
 def generate_account_details():
     account_dict={
@@ -44,3 +44,21 @@ def create_new_customer(custom_details,generate_account_details):
 def  delete_customer():
     pass
 
+def debit_account(amount,balance , account_number ,restictions) :
+    balance = float(balance)
+    amount = float(amount)
+
+    if balance < amount :
+        return {"Response" : "INSUFFICIENT_FUNDS"}
+    if restictions is not None:
+        return {"Response" : "DEBIT_ACCOUNT_RESTRICTED"}
+    if balance > amount  and restictions  is None:
+        new_bal = int(balance) - int(amount) 
+        with engine.begin() as connection:
+            update_balance_query = text("update corebank$01.account set balance = :balance where id = :id ")
+            connection.execute(update_balance_query,{"balance" : int(new_bal) , "id" : account_number })
+        return {"Response" : "ACCOUNT_DEBITED" , "balance" : balance , "amount" : amount}
+ 
+
+def credit_account():
+    pass 
