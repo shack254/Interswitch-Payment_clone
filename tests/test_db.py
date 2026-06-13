@@ -3,7 +3,6 @@ from bank.store import  get_account_details ,debit_account
 from sqlalchemy import create_engine, text
 import os
 
-
 @pytest.fixture
 def debit_account_setup(account_bal_setup):
     amount = '1000'

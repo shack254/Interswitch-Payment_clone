@@ -1,7 +1,7 @@
 import pytest
 import os
 from dotenv import load_dotenv
-from bank.store import  get_account_details 
+from bank.store import  get_account_details ,debit_account
 
 load_dotenv()
 
@@ -19,3 +19,5 @@ def account_bal_setup():
 @pytest.fixture
 def restricted_accont_setup():
     return get_account_details("254700000002")
+
+
