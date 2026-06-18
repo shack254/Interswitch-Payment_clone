@@ -1,7 +1,7 @@
 import pytest
 import os
 from dotenv import load_dotenv
-from bank.store import  get_account_details ,debit_account
+from bank.store import  AccountDetails
 
 load_dotenv()
 
@@ -13,11 +13,13 @@ def get_db_creds():
     return DB_PASSWORD ,DB_URL ,DB_USER
 
 @pytest.fixture
-def account_bal_setup():
-    return get_account_details("254700000001")
+def account_setup():
+    account = AccountDetails.from_account_table("254700000001")
+    return account
 
 @pytest.fixture
-def restricted_accont_setup():
-    return get_account_details("254700000002")
+def restricted_account_setup():
+    account = AccountDetails.from_account_table("254700000002")
+    return account
 
 

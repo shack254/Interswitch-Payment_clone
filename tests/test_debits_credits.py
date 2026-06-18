@@ -1,46 +1,35 @@
 import pytest
-from bank.store import  get_account_details ,debit_account ,credit_account
+from bank.store import  InsufficientFundsError ,AccountRestrictedError
+
 
 @pytest.fixture
-def debit_account_setup(account_bal_setup):
-    amount = '100'
-    debit_account(amount,account_bal_setup["balance"],account_bal_setup["id"],account_bal_setup["restictions"])
-    return get_account_details(account_bal_setup["id"])
+def credit_account_setup(account_setup):
+    amount = 100.00
+    return account_setup.credit_account(amount)
 
 @pytest.fixture
-def insuffince_funds_setup(account_bal_setup):
-    amount = '1000000'
-    return debit_account(amount,account_bal_setup["balance"],account_bal_setup["id"],account_bal_setup["restictions"])
+def account_credit_restriction_setup(restricted_account_setup):
+    return restricted_account_setup.credit_account(100)
 
-@pytest.fixture
-def account_restriction_setup(restricted_accont_setup):
-    return debit_account( 100,restricted_accont_setup["balance"],restricted_accont_setup["id"],restricted_accont_setup["restictions"]    )
+def test_debit_account(account_setup):
+    amount = 100
+    expected_balance = account_setup.balance - amount
+    assert account_setup.debit_account(amount) == expected_balance
 
-@pytest.fixture
-def credit_account_setup(account_bal_setup):
-    amount = '100'
-    return credit_account(amount,account_bal_setup["balance"],account_bal_setup["id"],account_bal_setup["restictions"])
+def test_insuffince_funds(account_setup):
+    amount = 1000000
+    with pytest.raises(InsufficientFundsError):
+        account_setup.debit_account(amount)
 
-@pytest.fixture
-def account_credit_restriction_setup(restricted_accont_setup):
-    return credit_account( 100,restricted_accont_setup["balance"],restricted_accont_setup["id"],restricted_accont_setup["restictions"]    )
+def test_debit_account_restiction(restricted_account_setup):
+    with pytest.raises(AccountRestrictedError):
+        restricted_account_setup.debit_account(100)
+        
+def test_credit_account(account_setup):
+    amount = 100
+    expected_balance = account_setup.balance + amount
+    assert account_setup.credit_account(amount) == expected_balance
 
-def test_debit_account(account_bal_setup, debit_account_setup):
-    expected_balance = float(account_bal_setup["balance"]) - 100
-    assert float(debit_account_setup["balance"]) == expected_balance
-
-def test_insuffince_funds(insuffince_funds_setup):
-    debit_account  = insuffince_funds_setup
-    assert debit_account["Response"] == "INSUFFICIENT_FUNDS"
-
-def test_debit_account_restiction(account_restriction_setup):
-    debit_account  = account_restriction_setup
-    assert debit_account["Response"] == "DEBIT_ACCOUNT_RESTRICTED"
-
-def test_credit_account(account_bal_setup,credit_account_setup):
-    expected_balance = float(account_bal_setup["balance"]) + 100
-    assert credit_account_setup["balance"] == expected_balance
-
-def test_credit_account_restiction(account_credit_restriction_setup):
-    credit_account = account_credit_restriction_setup
-    assert credit_account["Response"] == "CREDIT_ACCOUNT_RESTRICTED"
+def test_credit_account_restiction(restricted_account_setup):
+    with pytest.raises(AccountRestrictedError):
+        restricted_account_setup.debit_account(100)

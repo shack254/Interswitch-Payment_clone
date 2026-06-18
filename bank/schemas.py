@@ -10,6 +10,7 @@ class AccountDetailsResponse(BaseModel):
     customer_id:str
     restiction: str | None = None
 
+
 class InteranTranferRequst(BaseModel):
     debitaccount: str
     creditaccount :str
