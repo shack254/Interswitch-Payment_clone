@@ -48,7 +48,7 @@ class AccountDetails:
                        account["customer_id"] ,
                        account["restictions"])
 
-    def debit_account(self , amount:float) :
+    def debit(self , amount:float) :
         if self.balance < amount :
             raise InsufficientFundsError("Insufficient funds.")
         
@@ -69,7 +69,7 @@ class AccountDetails:
             return self.balance
     
 
-    def credit_account(self , amount :float):
+    def credit(self , amount :float):
         if self.restictions is not None:
             raise AccountRestrictedError("Credit restricted on this account.")
         else :

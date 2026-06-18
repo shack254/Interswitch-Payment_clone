@@ -17,6 +17,5 @@ class InteranTranferRequst(BaseModel):
     amount : float
 
 class InteranTranferResponse(BaseModel):
-    balance: str
     status :str
-    refrence : str
+    refrence : str = 'ft'
