@@ -10,12 +10,12 @@ class AccountDetailsResponse(BaseModel):
     customer_id:str
     restiction: str | None = None
 
+
 class InteranTranferRequst(BaseModel):
     debitaccount: str
     creditaccount :str
     amount : float
 
 class InteranTranferResponse(BaseModel):
-    balance: str
     status :str
-    refrence : str
+    refrence : str = 'ft'
