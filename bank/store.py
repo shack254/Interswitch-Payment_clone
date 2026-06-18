@@ -42,7 +42,7 @@ def debit_account(amount,balance , account_number ,restictions) :
         with engine.begin() as connection:
             update_balance_query = text("update corebank$01.account set balance = :balance where id = :id ")
             connection.execute(update_balance_query,{"balance" : float(new_bal) , "id" : account_number })
-        return {"Response" : "ACCOUNT_DEBITED" , "balance" : balance , "amount" : amount}
+        return {"Response" : "ACCOUNT_DEBITED" , "balance" : new_bal , "amount" : amount}
  
 
 def credit_account(amount ,balance , account_number , restictions):
