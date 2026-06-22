@@ -40,6 +40,6 @@ class OutwardWireTransferRequest(BaseTranferRequst):
     external_credit_account: str
     from_bank:str
     to_bank:str
-class OutwardWireTransferRequestResponse(InteranTranferResponse):
+class OutwardWireTransferResponse(InteranTranferResponse):
     pass
     
