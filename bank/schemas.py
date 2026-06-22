@@ -19,4 +19,18 @@ class InteranTranferRequst(BaseModel):
 
 class InteranTranferResponse(BaseModel):
     status :str
-    refrence : str = 'ft'
+    refrence:str = 'ft'
+    
+class WireTransferRequest(BaseModel):
+    debit_account: str
+    credi_taccount :str
+    amount : float
+    description:str | None = None
+    external_debit_account: str | None = None
+    external_credit_account: str | None = None
+    from_bank : str | None = None
+    to_bank  : str | None = None
+
+class WireTransferResponse(InteranTranferResponse):
+    pass
+    
