@@ -1,9 +1,11 @@
 from fastapi import FastAPI ,HTTPException ,status
 from fastapi.responses import JSONResponse
-from bank.schemas import AccountDetailsRequst ,AccountDetailsResponse  ,InteranTranferResponse ,InteranTranferRequst
+from bank.schemas import( AccountDetailsRequst ,AccountDetailsResponse  ,InteranTranferResponse ,
+                         InteranTranferRequst,IncomingWireTransferRequest,IncomingWireTransferResponse)
 from bank.store import (get_account_details ,AccountNotFoundError ,InsufficientFundsError ,
                         AccountRestrictedError , internaltransfer_core
 )
+from bank.wiretransfer import inward_wire_transfer
 app = FastAPI()
 
 @app.get("/")
@@ -44,3 +46,27 @@ def internaltransfer(requst:InteranTranferRequst):
         "status": "FAILED",
         "message": f"AccountRestrictedError"
     })
+
+@app.post("/IncomingWireTransfer/" , response_model = IncomingWireTransferResponse)
+def IncomingWireTransfer(requst:IncomingWireTransferRequest):
+    try:
+       Ref = inward_wire_transfer(requst)
+       return { 
+            "status": "SUCCESS",
+            "refrence": Ref
+       }
+    except AccountNotFoundError :
+        raise HTTPException(status_code=404, detail={
+        "status": "FAILED",
+        "message": "Account not found"
+    })
+    except InsufficientFundsError:
+       raise HTTPException(status_code=200, detail={
+        "status": "FAILED",
+        "message": f"InsufficientFundsError"
+    })
+    except AccountRestrictedError :
+       raise HTTPException(status_code=200, detail={
+        "status": "FAILED",
+        "message": f"AccountRestrictedError"
+    })  

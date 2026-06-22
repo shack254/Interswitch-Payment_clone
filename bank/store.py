@@ -90,31 +90,35 @@ def get_account_details(requst):
     with engine.connect() as connection:
         return AccountDetails.from_account_table(connection,requst.account)
 
-def populate_statement_entry(connection,request ) -> str: 
+def populate_statement_entry(connection,request , credit_account ,debit_account )  -> str: 
     statement_id = populate_stmt_id()
     query = text(
         "INSERT INTO corebank$01.statement "
-        "(id, credit_account, transaction_date, transaction_timestamp, amount, description, debit_account) "
+        "(id, credit_account, transaction_date, transaction_timestamp, amount, description, debit_account, external_debit_account, external_credit_account, from_bank, to_bank) "
         "VALUES "
-        "(:id, :credit_account, :transaction_date, :transaction_timestamp, :amount, :description, :debit_account)"
+        "(:id, :credit_account, :transaction_date, :transaction_timestamp, :amount, :description, :debit_account,  :external_debit_account, :external_credit_account, :from_bank, :to_bank)"
         )
     connection.execute(query,{"id": statement_id,
-                                "credit_account": request.creditaccount,
+                                "credit_account": credit_account,
                                 "transaction_date": time.strftime("%Y-%m-%d", time.localtime()),
                                 "transaction_timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                                 "amount": request.amount,
                                 "description": request.description,
-                                "debit_account": request.debitaccount,
+                                "debit_account": debit_account,
+                                "external_debit_account" : request.external_debit_account ,
+                                "external_credit_account" : request.external_credit_account, 
+                                "from_bank": request.from_bank ,
+                                "to_bank": request.to_bank
                             })
     return statement_id
 
 def internaltransfer_core(request ):
      with engine.begin() as connection:
-        debitaccount = AccountDetails.from_account_table(connection,request.debitaccount)
-        creditaccount = AccountDetails.from_account_table(connection,request.creditaccount)
-        debitaccount.debit(connection,request.amount)
-        creditaccount.credit(connection,request.amount)
-        return  populate_statement_entry(connection,request)
+        debit_account = AccountDetails.from_account_table(connection,request.debit_account)
+        credit_account = AccountDetails.from_account_table(connection,request.credit_account)
+        debit_account.debit(connection,request.amount)
+        credit_account.credit(connection,request.amount)
+        return  populate_statement_entry(connection,request,debit_account.account_number,credit_account.account_number)
         
 
 
