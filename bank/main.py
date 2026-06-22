@@ -1,8 +1,9 @@
 from fastapi import FastAPI ,HTTPException ,status
 from fastapi.responses import JSONResponse
 from bank.schemas import AccountDetailsRequst ,AccountDetailsResponse  ,InteranTranferResponse ,InteranTranferRequst
-from bank.store import AccountDetails ,AccountNotFoundError ,InsufficientFundsError ,AccountRestrictedError
-
+from bank.store import (get_account_details ,AccountNotFoundError ,InsufficientFundsError ,
+                        AccountRestrictedError , internaltransfer_core
+)
 app = FastAPI()
 
 @app.get("/")
@@ -12,7 +13,7 @@ def health_check():
 @app.post("/getaccountdetails/", response_model=AccountDetailsResponse)
 def getaccountdetails( accountrequst:AccountDetailsRequst):
     try :
-        accountdetailsresponse = AccountDetails.from_account_table(accountrequst.account)
+        accountdetailsresponse = get_account_details(accountrequst.account)
         return accountdetailsresponse
     except AccountNotFoundError :
         raise HTTPException(status_code=404, detail={
@@ -23,10 +24,7 @@ def getaccountdetails( accountrequst:AccountDetailsRequst):
 @app.post("/internaltransfer/" , response_model = InteranTranferResponse)
 def internaltransfer(requst:InteranTranferRequst):
    try:
-       debitaccount = AccountDetails.from_account_table(requst.debitaccount)
-       creditaccount = AccountDetails.from_account_table(requst.creditaccount)
-       debitaccount.debit(requst.amount)
-       creditaccount.credit(requst.amount)
+       internaltransfer_core(requst)
        return { 
             "status": "SUCCESS",
             "refrence": "FT"
