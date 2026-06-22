@@ -22,3 +22,23 @@ def create_new_customer(custom_details,generate_account_details):
 
 def  delete_customer():
     pass
+
+class statement:
+    def __init__(self ,credit_account:str, 
+                 transaction_date, 
+                 transaction_timestamp,
+                 amount, 
+                 debit_account,
+                 statement_id = None,
+                 description = None,
+                 external_debit_account = None, 
+                 external_credit_account = None):
+        self.statement_id = statement_id 
+        self.credit_account = credit_account
+        self.transaction_date = transaction_date
+        self.transaction_timestamp = transaction_timestamp
+        self.amount = amount
+        self.description = description
+        self.debit_account = debit_account
+        self.external_debit_account = external_debit_account
+        self.external_credit_account = external_credit_account

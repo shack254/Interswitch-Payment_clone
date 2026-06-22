@@ -24,10 +24,10 @@ def getaccountdetails( accountrequst:AccountDetailsRequst):
 @app.post("/internaltransfer/" , response_model = InteranTranferResponse)
 def internaltransfer(requst:InteranTranferRequst):
    try:
-       internaltransfer_core(requst)
+       Ref = internaltransfer_core(requst)
        return { 
             "status": "SUCCESS",
-            "refrence": "FT"
+            "refrence": Ref
        }       
    except AccountNotFoundError :
         raise HTTPException(status_code=404, detail={

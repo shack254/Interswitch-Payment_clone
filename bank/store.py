@@ -1,6 +1,9 @@
 from sqlalchemy import  text
 import random
 from .database import engine
+import time
+import random
+import string
 class AccountNotFoundError(Exception): 
     def __init__(self, account_number):
         super().__init__(f"Account {account_number} not found.")
@@ -70,8 +73,11 @@ class AccountDetails:
                                 )
             return self.balance
 
-class Statement:
-    pass
+def populate_stmt_id():
+    date = time.strftime("%y%m%d", time.localtime())
+    alphabet = string.ascii_uppercase
+    return f"UQ{date}{"".join(random.choices(alphabet , k =5))}"    
+    
         
 def get_customer_details(account_number):
     with engine.connect() as connection:
@@ -84,10 +90,33 @@ def get_account_details(requst):
     with engine.connect() as connection:
         return AccountDetails.from_account_table(connection,requst.account)
 
-def internaltransfer_core(requst):
+def populate_statement_entry(connection,request ) -> str: 
+    statement_id = populate_stmt_id()
+    query = text(
+        "INSERT INTO corebank$01.statement "
+        "(id, credit_account, transaction_date, transaction_timestamp, amount, description, debit_account) "
+        "VALUES "
+        "(:id, :credit_account, :transaction_date, :transaction_timestamp, :amount, :description, :debit_account)"
+        )
+    connection.execute(query,{"id": statement_id,
+                                "credit_account": request.creditaccount,
+                                "transaction_date": time.strftime("%Y-%m-%d", time.localtime()),
+                                "transaction_timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                                "amount": request.amount,
+                                "description": request.description,
+                                "debit_account": request.debitaccount,
+                            })
+    return statement_id
+
+def internaltransfer_core(request ):
      with engine.begin() as connection:
-        debitaccount = AccountDetails.from_account_table(connection,requst.debitaccount)
-        creditaccount = AccountDetails.from_account_table(connection,requst.creditaccount)
-        debitaccount.debit(connection,requst.amount)
-        creditaccount.credit(connection,requst.amount)
+        debitaccount = AccountDetails.from_account_table(connection,request.debitaccount)
+        creditaccount = AccountDetails.from_account_table(connection,request.creditaccount)
+        debitaccount.debit(connection,request.amount)
+        creditaccount.credit(connection,request.amount)
+        return  populate_statement_entry(connection,request)
+        
+
+
+    
  
